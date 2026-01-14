@@ -1,0 +1,188 @@
+# terraform.tfvars.example
+# Example configuration for category-based S3 folder structure
+
+# Define categories with their S3 buckets (raw, staging, curated)
+categories = {
+  alpha = {
+    raw_bucket     = "company-alpha-raw"
+    staging_bucket = "company-alpha-staging"
+    curated_bucket = "company-alpha-curated"
+    description    = "Alpha category for enterprise clients"
+  }
+  beta = {
+    raw_bucket     = "company-beta-raw"
+    staging_bucket = "company-beta-staging"
+    curated_bucket = "company-beta-curated"
+    description    = "Beta category for standard clients"
+  }
+  gamma = {
+    raw_bucket     = "company-gamma-raw"
+    staging_bucket = "company-gamma-staging"
+    curated_bucket = "company-gamma-curated"
+    description    = "Gamma category for development/testing"
+  }
+}
+
+# Define tenants with their category, business unit, and bucket type assignments
+# Each tenant can specify which business units AND which bucket types they need
+tenants = {
+  tenant1 = {
+    tenant_name    = "tenant1"
+    category       = "alpha"  # Enterprise client
+    business_units = ["BusinessDEV", "BusinessQA"]  # Both DEV and QA
+    bucket_types   = ["raw", "staging", "curated"]  # All three buckets (full pipeline)
+    active         = true
+  }
+  tenant2 = {
+    tenant_name    = "tenant2"
+    category       = "beta"   # Standard client
+    business_units = ["BusinessDEV", "BusinessQA"]  # Both DEV and QA
+    bucket_types   = ["raw", "curated"]  # No staging (direct raw-to-curated)
+    active         = true
+  }
+  tenant3 = {
+    tenant_name    = "tenant3"
+    category       = "beta"   # Standard client - minimal setup
+    business_units = ["BusinessDEV"]  # Only DEV
+    bucket_types   = ["raw"]  # Only raw bucket (no processing)
+    active         = true
+  }
+  tenant4 = {
+    tenant_name    = "tenant4"
+    category       = "gamma"  # Development/testing
+    business_units = ["BusinessQA"]  # Only QA
+    bucket_types   = ["raw", "staging"]  # Raw and staging for testing
+    active         = true
+  }
+  tenant5 = {
+    tenant_name    = "tenant5"
+    category       = "gamma"  # Development/testing
+    business_units = ["BusinessDEV", "BusinessQA"]  # Both
+    bucket_types   = ["curated"]  # Only curated (reads from shared staging)
+    active         = true
+  }
+}
+
+# AWS Configuration
+aws_region = "us-east-1"
+
+# Common tags applied to all S3 objects
+common_tags = {
+  ManagedBy   = "Terraform"
+  Environment = "Production"
+  Project     = "Multi-Tenant-Data-Platform"
+}
+
+
+# ==============================================================================
+# ALTERNATIVE EXAMPLE 1: Regional Categories
+# ==============================================================================
+# categories = {
+#   us_east = {
+#     raw_bucket     = "us-east-raw"
+#     staging_bucket = "us-east-staging"
+#     curated_bucket = "us-east-curated"
+#     description    = "US East region"
+#   }
+#   eu_west = {
+#     raw_bucket     = "eu-west-raw"
+#     staging_bucket = "eu-west-staging"
+#     curated_bucket = "eu-west-curated"
+#     description    = "EU West region"
+#   }
+# }
+# 
+# tenants = {
+#   us_tenant1 = {
+#     tenant_name    = "us_tenant1"
+#     category       = "us_east"
+#     business_units = ["BusinessDEV", "BusinessQA"]
+#     bucket_types   = ["raw", "staging", "curated"]
+#     active         = true
+#   }
+#   eu_tenant1 = {
+#     tenant_name    = "eu_tenant1"
+#     category       = "eu_west"
+#     business_units = ["BusinessDEV", "BusinessQA"]
+#     bucket_types   = ["raw", "staging", "curated"]
+#     active         = true
+#   }
+# }
+
+
+# ==============================================================================
+# ALTERNATIVE EXAMPLE 2: Environment-Based Categories
+# ==============================================================================
+# categories = {
+#   production = {
+#     raw_bucket     = "prod-raw"
+#     staging_bucket = "prod-staging"
+#     curated_bucket = "prod-curated"
+#     description    = "Production environment"
+#   }
+#   development = {
+#     raw_bucket     = "dev-raw"
+#     staging_bucket = "dev-staging"
+#     curated_bucket = "dev-curated"
+#     description    = "Development environment"
+#   }
+# }
+# 
+# tenants = {
+#   app1_prod = {
+#     tenant_name    = "app1"
+#     category       = "production"
+#     business_units = ["BusinessDEV"]
+#     bucket_types   = ["raw", "curated"]  # Production: skip staging
+#     active         = true
+#   }
+#   app1_dev = {
+#     tenant_name    = "app1_dev"
+#     category       = "development"
+#     business_units = ["BusinessDEV", "BusinessQA"]
+#     bucket_types   = ["raw", "staging", "curated"]  # Dev: full pipeline
+#     active         = true
+#   }
+# }
+
+
+# ==============================================================================
+# ALTERNATIVE EXAMPLE 3: Tier-Based Categories
+# ==============================================================================
+# categories = {
+#   enterprise = {
+#     raw_bucket     = "enterprise-raw"
+#     staging_bucket = "enterprise-staging"
+#     curated_bucket = "enterprise-curated"
+#     description    = "Enterprise tier - dedicated resources"
+#   }
+#   premium = {
+#     raw_bucket     = "premium-raw"
+#     staging_bucket = "premium-staging"
+#     curated_bucket = "premium-curated"
+#     description    = "Premium tier - enhanced features"
+#   }
+#   standard = {
+#     raw_bucket     = "standard-raw"
+#     staging_bucket = "standard-staging"
+#     curated_bucket = "standard-curated"
+#     description    = "Standard tier - basic features"
+#   }
+# }
+# 
+# tenants = {
+#   acme_corp = {
+#     tenant_name    = "acme_corp"
+#     category       = "enterprise"
+#     business_units = ["BusinessDEV", "BusinessQA"]  # Full access
+#     bucket_types   = ["raw", "staging", "curated"]  # Complete pipeline
+#     active         = true
+#   }
+#   startup_xyz = {
+#     tenant_name    = "startup_xyz"
+#     category       = "standard"
+#     business_units = ["BusinessDEV"]  # Production only
+#     bucket_types   = ["raw"]  # Minimal: just raw data
+#     active         = true
+#   }
+# }
